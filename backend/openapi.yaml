@@ -1,0 +1,413 @@
+openapi: 3.0.3
+info:
+  title: Event Manager API
+  description: API for managing events, user authentication, help desk interactions, and administrative tasks.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          example: password123
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+
+    RefreshDto:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
+    CreateEventDto:
+      type: object
+      required:
+        - title
+        - occurrence
+      properties:
+        title:
+          type: string
+          maxLength: 150
+          example: My First Event
+        occurrence:
+          type: string
+          format: date-time
+          example: "2024-12-25T10:00:00.000Z"
+        description:
+          type: string
+          maxLength: 5000
+          example: This is a test event.
+
+    UpdateEventDescriptionDto:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+          maxLength: 5000
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        occurrence:
+          type: string
+          format: date-time
+        description:
+          type: string
+        userId:
+          type: string
+          format: uuid
+
+    SendMessageDto:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          maxLength: 2000
+          example: How do I create an event?
+
+    ChatResponse:
+      type: object
+      properties:
+        text:
+          type: string
+        sourceReferences:
+          type: array
+          items:
+            type: string
+
+    AdminCreateUserDto:
+      type: object
+      required:
+        - email
+        - roles
+      properties:
+        email:
+          type: string
+          format: email
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [USER, AGENT, ADMIN]
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        senderId:
+          type: string
+          format: uuid
+        receiverId:
+          type: string
+          format: uuid
+          nullable: true
+
+paths:
+  /:
+    get:
+      summary: Health Check
+      description: Basic health check endpoint to verify the service is running.
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hello World!
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login
+      description: Authenticate a user and return access and refresh tokens.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+      responses:
+        '201':
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh Token
+      description: Issue a new access token using a valid refresh token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshDto'
+      responses:
+        '201':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /events:
+    get:
+      tags:
+        - Events
+      summary: List Events
+      description: Retrieve a list of all events associated with the authenticated user.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+    post:
+      tags:
+        - Events
+      summary: Create Event
+      description: Create a new event for the authenticated user.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventDto'
+      responses:
+        '201':
+          description: Event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+
+  /events/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags:
+        - Events
+      summary: Update Event Description
+      description: Update the description of an existing event.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventDescriptionDto'
+      responses:
+        '200':
+          description: Event updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+    delete:
+      tags:
+        - Events
+      summary: Delete Event
+      description: Delete an existing event.
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Event deleted (No Content)
+
+  /helpdesk/chat:
+    post:
+      tags:
+        - Help Desk
+      summary: Send Chat Message
+      description: Send a message to the AI help desk and receive an automated response.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageDto'
+      responses:
+        '201':
+          description: AI response received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+
+  /helpdesk/chat/history:
+    get:
+      tags:
+        - Help Desk
+      summary: Get Chat History
+      description: Retrieve the chat history for the authenticated user.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of chat messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatMessage'
+
+  /helpdesk/queue:
+    get:
+      tags:
+        - Help Desk
+      summary: Get Support Queue
+      description: Retrieve all active support requests (AGENT or ADMIN only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of messages in the queue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatMessage'
+        '403':
+          description: Forbidden - Insufficient roles
+
+  /helpdesk/chat/{userId}/reply:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - Help Desk
+      summary: Reply to User
+      description: Send a manual reply to a user's help desk request (AGENT or ADMIN only).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Reply sent
+        '403':
+          description: Forbidden - Insufficient roles
+
+  /admin/users:
+    post:
+      tags:
+        - Admin
+      summary: Create User
+      description: Provision a new user or admin (ADMIN only).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminCreateUserDto'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  email:
+                    type: string
+                  tempPassword:
+                    type: string
+        '403':
+          description: Forbidden - Insufficient roles
+
+  /users/me:
+    delete:
+      tags:
+        - User Management
+      summary: Delete Own Account
+      description: Deletes the authenticated user's account and all associated data.
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Account deleted (No Content)

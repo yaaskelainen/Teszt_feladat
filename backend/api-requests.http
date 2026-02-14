@@ -1,0 +1,176 @@
+### Event Manager API - HTTP Requests
+### You can use this file in VS Code with the REST Client extension
+### Or as reference for curl commands
+
+@baseUrl = http://localhost:3000
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+@adminToken = YOUR_ADMIN_TOKEN_HERE
+@eventId = YOUR_EVENT_ID_HERE
+
+### ============================================
+### HEALTH CHECK
+### ============================================
+
+### Health Check
+GET {{baseUrl}}/
+
+### ============================================
+### AUTHENTICATION
+### ============================================
+
+### Login - Regular User
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+### Login - Admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "admin123"
+}
+
+### Login - Agent
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "agent@example.com",
+  "password": "agent123"
+}
+
+### Refresh Token
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "YOUR_REFRESH_TOKEN_HERE"
+}
+
+### ============================================
+### EVENTS
+### ============================================
+
+### Create Event
+POST {{baseUrl}}/events
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Team Meeting",
+  "occurrence": "2024-12-25T10:00:00.000Z",
+  "description": "Quarterly review and planning session"
+}
+
+### Get All Events
+GET {{baseUrl}}/events
+Authorization: Bearer {{accessToken}}
+
+### Update Event
+PATCH {{baseUrl}}/events/{{eventId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "description": "Updated: Now includes budget review"
+}
+
+### Delete Event
+DELETE {{baseUrl}}/events/{{eventId}}
+Authorization: Bearer {{accessToken}}
+
+### ============================================
+### HELP DESK
+### ============================================
+
+### Send Chat Message
+POST {{baseUrl}}/helpdesk/chat
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "How do I create a new event?"
+}
+
+### Get Chat History
+GET {{baseUrl}}/helpdesk/chat/history
+Authorization: Bearer {{accessToken}}
+
+### Get Support Queue (AGENT only)
+GET {{baseUrl}}/helpdesk/queue
+Authorization: Bearer {{adminToken}}
+
+### Reply to User (AGENT only)
+POST {{baseUrl}}/helpdesk/chat/USER_ID_HERE/reply
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "content": "Thank you for your question! To create an event, use the POST /events endpoint."
+}
+
+### ============================================
+### ADMIN
+### ============================================
+
+### Create User (ADMIN only)
+POST {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "roles": ["USER"]
+}
+
+### Create Admin User (ADMIN only)
+POST {{baseUrl}}/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "email": "newadmin@example.com",
+  "roles": ["ADMIN", "AGENT"]
+}
+
+### ============================================
+### USER MANAGEMENT
+### ============================================
+
+### Delete Own Account
+DELETE {{baseUrl}}/users/me
+Authorization: Bearer {{accessToken}}
+
+### ============================================
+### CURL COMMAND EXAMPLES
+### ============================================
+
+# Health Check
+# curl http://localhost:3000/
+
+# Login
+# curl -X POST http://localhost:3000/auth/login \
+#   -H "Content-Type: application/json" \
+#   -d '{"email":"user@example.com","password":"password123"}'
+
+# Create Event
+# curl -X POST http://localhost:3000/events \
+#   -H "Content-Type: application/json" \
+#   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+#   -d '{"title":"Meeting","occurrence":"2024-12-25T10:00:00.000Z","description":"Test"}'
+
+# Get Events
+# curl http://localhost:3000/events \
+#   -H "Authorization: Bearer YOUR_TOKEN_HERE"
+
+# Send Help Desk Message
+# curl -X POST http://localhost:3000/helpdesk/chat \
+#   -H "Content-Type: application/json" \
+#   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+#   -d '{"content":"How do I create an event?"}'

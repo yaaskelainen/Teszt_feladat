@@ -1,0 +1,52 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  passwordHash    String
+  roles           String[]  @default(["USER"])
+  mfaSecret       String?
+  mfaEnabled      Boolean   @default(false)
+  mfaCode         String?
+  mfaCodeExpires  DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  events          Event[]
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title       String
+  occurrence  DateTime
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatMessage {
+  id              String   @id @default(uuid())
+  chatId          String   // Grouping ID or typically just the User's ID for 1-to-1 help desk
+  senderId        String
+  senderRole      String   // 'USER' or 'AGENT'
+  content         String
+  isHumanRequired Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  userId    String?
+  metadata  String?  // JSON string
+  createdAt DateTime @default(now())
+}
