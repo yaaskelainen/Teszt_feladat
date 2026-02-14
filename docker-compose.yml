@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: event-manager-backend
+    ports:
+      - '3010:3000'
+    env_file:
+      - ./backend/.env
+    environment:
+      # Override DATABASE_URL to use Docker service name instead of localhost
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-event_manager}?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - event-network
+
+  frontend:
+    build: ./frontend
+    container_name: event-manager-frontend
+    ports:
+      - '3011:3000'
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      # For browser (client-side): Use host port (HTTPS)
+      - NEXT_PUBLIC_API_URL=https://localhost:3010
+      # For SSR (server-side within Docker): Use service name (HTTPS)
+      - API_URL=https://backend:3000
+      # Allow self-signed certificates for local development Inter-container communication
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    depends_on:
+      - backend
+    networks:
+      - event-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: event-manager-db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+      - POSTGRES_DB=${POSTGRES_DB:-event_manager}
+    ports:
+      - '${POSTGRES_PORT:-5440}:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - event-network
+
+networks:
+  event-network:
+    driver: bridge
+
+volumes:
+  db-data:

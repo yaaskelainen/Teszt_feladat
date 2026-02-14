@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+build
+dist
+.vercel
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+*.log
+*.txt
