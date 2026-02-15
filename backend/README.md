@@ -90,17 +90,27 @@ All requests should include `Content-Type: application/json`. Protected endpoint
 
 ## 🧪 Testing
 
-The project maintains a 100% success rate across three tiers of testing.
+The project maintains a 100% success rate across three tiers of testing. 
 
-**Run All Tests**:
+### ⚠️ Infrastructure Requirements
+- **Docker Requirement**: To run the full test suite via the managed script (`run-all-tests.ps1`), **Docker must be installed**. The script automatically builds a dedicated PostgreSQL container, runs tests, and disposes of it afterwards.
+- **Manual Runs**: If running integration or E2E tests individually without the master script, a PostgreSQL database **must be running in the background** with the following configuration:
+  - **User**: `test_user`
+  - **Password**: `test_password`
+  - **Database**: `test_db`
+  - **Port**: `5432`
+  - **Prisma Setup**: Run `npx prisma db push` against this test database before running tests.
+
+### Running Tests
+**Run All Tests (Easiest)**:
 ```bash
 powershell ./scripts/run-all-tests.ps1
 ```
 
 **Individual Levels**:
-- **Unit**: `npm run test`
-- **Integration**: `powershell ./scripts/run-integration-tests.ps1`
-- **E2E (Journey)**: `powershell ./scripts/run-e2e-tests.ps1`
+- **Unit**: `npm run test` (No database required)
+- **Integration**: `powershell ./scripts/run-integration-tests.ps1` (Requires background DB)
+- **E2E (Journey)**: `powershell ./scripts/run-e2e-tests.ps1` (Requires background DB)
 
 ---
 

@@ -298,6 +298,29 @@ Verify the interaction between components and the API client.
 -   **FE-SEC-001**: Token handling verified by API Client tests.
 
 ---
+## 7. Execution Environment & Infrastructure
+
+### 7.1 Backend Test Infrastructure
+To ensure test reliability and isolation, the backend requires a managed database environment.
+
+- **Docker-Managed Execution (Recommended)**:
+  Run all tests using the provided PowerShell script: `powershell ./scripts/run-all-tests.ps1`.
+  - **Requirement**: Docker Desktop / Engine must be installed and running.
+  - **Behavior**: The script spins up a temporary PostgreSQL container, pushes the Prisma schema, executes all test tiers, and destroys the container afterwards.
+
+- **Manual/Individual Execution**:
+  When running `npm run test` (unit), `powershell ./scripts/run-integration-tests.ps1`, or `powershell ./scripts/run-e2e-tests.ps1` individually:
+  - **Unit Tests**: No database required (uses mocks).
+  - **Integration & E2E Tests**: Requires a background PostgreSQL instance.
+  - **Required Configuration**:
+    - **Host**: `localhost`
+    - **Port**: `5432`
+    - **User**: `test_user`
+    - **Password**: `test_password`
+    - **Database**: `test_db`
+  - **Prisma Sync**: Ensure `npx prisma db push` has been run against the test database before starting.
+
+---
 **Prepared by Test Manager**
-*Last Updated: 2026-02-14*
+*Last Updated: 2026-02-15*
 

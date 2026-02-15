@@ -101,24 +101,30 @@ Frontend will run on **http://localhost:3001** (or port shown in terminal)
 
 ### Backend Tests
 
-```bash
-cd backend
+Testing the backend requires specific infrastructure depending on how you run the tests:
 
-# Unit tests
-npm run test
+- **Full Suite (Automatic)**: Requires **Docker**. The script manages the database lifecycle.
+  ```bash
+  cd backend
+  powershell ./scripts/run-all-tests.ps1
+  ```
+- **Individual Tests (Manual)**: Requires a **PostgreSQL database running in the background** (specifically configured with user `test_user`, password `test_password`, and db `test_db`).
+  ```bash
+  cd backend
+  # Unit tests (No DB required)
+  npm run test
+  # Integration/E2E (Requires background DB)
+  powershell ./scripts/run-integration-tests.ps1
+  powershell ./scripts/run-e2e-tests.ps1
+  ```
 
-# Integration tests
-npm run test:integration
-
-# E2E tests
-npm run test:e2e
-
-# All tests
-npm run test:all
-
-# Test coverage
-npm run test:cov
-```
+| Level | Command | Requirements |
+| :--- | :--- | :--- |
+| **Full Suite** | `powershell ./scripts/run-all-tests.ps1` | Docker |
+| **Unit** | `npm run test` | None |
+| **Integration**| `powershell ./scripts/run-integration-tests.ps1` | Background DB |
+| **E2E** | `powershell ./scripts/run-e2e-tests.ps1` | Background DB |
+| **Coverage** | `npm run test:cov` | None (Unit coverage) |
 
 ### Frontend Tests
 
