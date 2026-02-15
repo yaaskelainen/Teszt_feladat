@@ -15,11 +15,17 @@ cd event-management-system
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env.local
 
-# 3. Edit backend/.env and add your Gemini API key
+# 3. Provide SSL/TLS Certificates (Required for HTTPS)
+# Create the directory if it doesn't exist:
+mkdir -p backend/certs
+# Place your 'server.key' and 'server.crt' in 'backend/certs/'
+# (For local dev, self-signed certificates are acceptable)
+
+# 4. Edit backend/.env and add your Gemini API key
 # GEMINI_API_KEY=your-api-key-here
 # (Other values can remain as defaults for Docker)
 
-# 4. Start everything with Docker Compose
+# 5. Start everything with Docker Compose
 docker-compose up --build
 ```
 
@@ -65,6 +71,10 @@ npm install
 # Set up environment variables
 cp .env.example .env
 # Edit .env and add your database URL and Gemini API key
+
+# Set up SSL/TLS Certificates
+mkdir -p certs
+# Place 'server.key' and 'server.crt' into 'backend/certs/'
 
 # Set up database
 npx prisma generate

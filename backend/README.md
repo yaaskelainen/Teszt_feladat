@@ -27,7 +27,16 @@ Welcome to the Event Management System backend. This is a robust, security-focus
 - **Docker & Docker Compose**
 - **Git**
 
-### 2. Environment Configuration
+### 2. SSL/TLS Certificates (Required)
+The application is configured to run on HTTPS. You must provide SSL certificates in the following location:
+- Create a directory: `backend/certs/`
+- Place your certificate files inside:
+  - `backend/certs/server.key`
+  - `backend/certs/server.crt`
+
+*Note: These files are ignored by Git for security. For local development, you can use self-signed certificates.*
+
+### 3. Environment Configuration
 Create a `.env` file in this directory by copying the example provided:
 
 ```bash
