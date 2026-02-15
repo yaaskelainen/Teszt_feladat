@@ -5,7 +5,7 @@ Welcome to the Event Management System backend. This is a robust, security-focus
 ## 🚀 Key Features
 
 - **Centralized Audit Logging**: Automated tracking of all security-relevant events (Login, User Creation, Event CRUD).
-- **AI-Powered Help Desk**: Integrated Google Gemini 1.5 Flash for automated, intelligent support responses.
+- **AI-Powered Help Desk**: Integrated Google Gemini Flash for automated, intelligent support responses.
 - **Advanced Security**: Multi-Factor Authentication (MFA/TOTP), JWT-based session management, and Role-Based Access Control (RBAC).
 - **Resilient Infrastructure**: Centralized error handling, request throttling, and comprehensive testing (Unit, Integration, E2E).
 
@@ -14,7 +14,7 @@ Welcome to the Event Management System backend. This is a robust, security-focus
 - **Framework**: [NestJS](https://nestjs.com/) (TypeScript)
 - **ORM**: [Prisma](https://www.prisma.io/)
 - **Database**: [PostgreSQL](https://www.postgresql.org/)
-- **AI**: [Google Gemini Pro 1.5](https://ai.google.dev/)
+- **AI**: [Google Gemini Flash (Latest)](https://ai.google.dev/)
 - **Testing**: Jest & Supertest
 - **Containerization**: Docker
 

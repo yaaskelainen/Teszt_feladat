@@ -251,7 +251,7 @@ export class GeminiAdapter implements IAIService {
 - **Frontend**: Next.js 14+ (App Router), Tailwind CSS.
 - **Backend**: NestJS, TypeScript 5+.
 - **Database**: PostgreSQL + Prisma ORM.
-- **AI**: Google Gemini 1.5 Flash (Free Tier).
+- **AI**: Google Gemini Flash (Latest Free Tier).
 
 ### 5.2 Quality Assurance
 - **Unit Testing**: 
